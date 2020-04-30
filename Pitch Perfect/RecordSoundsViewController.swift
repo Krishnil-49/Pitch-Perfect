@@ -20,12 +20,7 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        recordButton.layer.cornerRadius = 50
-        recordButton.layer.masksToBounds = true
         recordButton.isEnabled = true
-        
-        stopRecordingButton.layer.cornerRadius = 25
-        stopRecordingButton.layer.masksToBounds = true
         stopRecordingButton.isEnabled = false
         
     }
@@ -41,9 +36,14 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         let filePath = URL(string: pathArray.joined(separator: "/"))
 
         let session = AVAudioSession.sharedInstance()
-        try! session.setCategory(AVAudioSession.Category.playAndRecord, mode: AVAudioSession.Mode.default, options: AVAudioSession.CategoryOptions.defaultToSpeaker)
-
-        try! audioRecorder = AVAudioRecorder(url: filePath!, settings: [:])
+        
+        do{
+            try session.setCategory(AVAudioSession.Category.playAndRecord, mode: AVAudioSession.Mode.default, options: AVAudioSession.CategoryOptions.defaultToSpeaker)
+            try audioRecorder = AVAudioRecorder(url: filePath!, settings: [:])
+        }catch let error{
+            print(error)
+        }
+        
         audioRecorder.delegate = self
         audioRecorder.isMeteringEnabled = true
         audioRecorder.prepareToRecord()
@@ -58,7 +58,12 @@ class RecordSoundsViewController: UIViewController, AVAudioRecorderDelegate {
         
         audioRecorder.stop()
         let audioSession = AVAudioSession.sharedInstance()
-        try! audioSession.setActive(false)
+        
+        do{
+            try audioSession.setActive(false)
+        }catch let error{
+            print(error)
+        }
     }
     
     func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
